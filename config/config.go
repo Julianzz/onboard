@@ -7,16 +7,19 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+// DBSetting database setting
+type DBSetting struct {
+	Host     string `yaml:"host"`
+	Database string `yaml:"database"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+}
+
 // Config  server configuration
 type Config struct {
 
 	// DBSetting database settings
-	DBSetting struct {
-		Host     string `yaml:"host"`
-		Database string `yaml:"database"`
-		User     string `yaml:"user"`
-		Password string `yaml:"password"`
-	} `yaml:"db_settings"`
+	DBSetting DBSetting `yaml:"db_settings"`
 }
 
 // NewConfig read config file
