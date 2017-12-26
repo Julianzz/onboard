@@ -1,0 +1,6 @@
+
+db_settings:
+  host: "127.0.0.1:5432"
+  database: "test"
+  user: "liuzhenzhong"
+  password: ""
