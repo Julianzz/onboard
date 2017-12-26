@@ -1,0 +1,41 @@
+hash: e5725e1f7d9f72adc5503f133cfa0fc671c8adf16000287048452dc08b22ecc1
+updated: 2017-12-26T12:06:14.583158+08:00
+imports:
+- name: github.com/go-pg/migrations
+  version: 56f220c05c9e11f7ca5b06a232e43eda16ce2cde
+- name: github.com/go-pg/pg
+  version: ae0c997e25779e2e0c7a029203454e690fa67c88
+  subpackages:
+  - internal
+  - internal/parser
+  - internal/pool
+  - orm
+  - types
+- name: github.com/golang-plus/errors
+  version: ba223c001a0652d97128ab4f47efee9d7529560b
+- name: github.com/golang-plus/uuid
+  version: a0510c37ef1f49c8290c3a9911d0f7f9ed24d335
+  subpackages:
+  - internal
+  - internal/dcesecurity
+  - internal/namebased
+  - internal/namebased/md5
+  - internal/namebased/sha1
+  - internal/random
+  - internal/timebased
+- name: github.com/gorilla/context
+  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
+- name: github.com/gorilla/mux
+  version: 7f08801859139f86dfafd1c296e2cba9a80d292e
+- name: github.com/jinzhu/inflection
+  version: 1c35d901db3da928c72a72d8458480cc9ade058f
+- name: github.com/santhosh-tekuri/jsonschema
+  version: 63accc9deedeee33b7caf4e241f8a9ebdf031069
+  subpackages:
+  - formats
+  - loader
+- name: gopkg.in/check.v1
+  version: 20d25e2804050c1cd24a7eea1e7a6447dd0e74ec
+- name: gopkg.in/yaml.v2
+  version: 287cf08546ab5e7e37d55a84f7ed3fd1db036de5
+testImports: []

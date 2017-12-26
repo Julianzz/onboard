@@ -1,0 +1,15 @@
+package: github.com/p1cn/onboard/liuzhenzhong
+import:
+- package: github.com/go-pg/migrations
+  version: ^6.1.0
+- package: github.com/go-pg/pg
+  version: ^6.6.21
+- package: github.com/gorilla/mux
+  version: ^1.6.0
+- package: gopkg.in/yaml.v2
+- package: gopkg.in/check.v1
+- package: github.com/santhosh-tekuri/jsonschema
+  version: ^1.0.0
+- package: github.com/golang-plus/uuid
+  version: ^1.0.0
+- package: github.com/jinzhu/inflection
