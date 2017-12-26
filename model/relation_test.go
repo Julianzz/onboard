@@ -25,26 +25,48 @@ func (t *DBTest) TestRelationsFetch(c *C) {
 	c.Assert(relations[0].WipeUserID, Equals, userID2)
 }
 
-func (t *DBTest) TestUpdateRelation(c *C) {
-	var userID1 = "test1"
-	var userID2 = "test2"
+func (t *DBTest) TestUpdateBatchRelation(c *C) {
 
-	fmt.Println("inside test update relation")
+	mockDatas := [][]string{
+		[]string{"test1", "test2", "liked", "liked"},
+		[]string{"test2", "test3", "liked", "disliked"},
+		[]string{"test3", "test4", "disliked", "disliked"},
+	}
 
-	err := CreateUserRelation(userID1, userID2, "relation", "liked")
+	for _, relation := range mockDatas {
+		userID1, userID2, state1, state2 := relation[0], relation[1], relation[2], relation[3]
+		err := CreateUserRelation(userID1, userID2, "relation", state1)
+		c.Assert(err, IsNil)
+
+		rel, err := GetRelationsByUserIDs(userID1, userID2)
+		c.Assert(rel, NotNil)
+		c.Assert(err, IsNil)
+		c.Assert(rel.State, Equals, state1)
+		c.Assert(rel.WipeUserID, Equals, userID2)
+
+		err = CreateUserRelation(userID2, userID1, "relation", state2)
+		c.Assert(err, IsNil)
+
+		if state1 == state2 && state1 == "liked" {
+			state1 = "matched"
+			state2 = "matched"
+		}
+		rel, err = GetRelationsByUserIDs(userID2, userID1)
+		c.Assert(rel, NotNil)
+		c.Assert(err, IsNil)
+		c.Assert(rel.State, Equals, state2)
+		c.Assert(rel.WipeUserID, Equals, userID1)
+
+		rel, err = GetRelationsByUserIDs(userID1, userID2)
+		c.Assert(rel, NotNil)
+		c.Assert(err, IsNil)
+		c.Assert(rel.State, Equals, state1)
+		c.Assert(rel.WipeUserID, Equals, userID2)
+		fmt.Println("inside test update relation")
+	}
+
+	userID := mockDatas[1][0]
+	relations, err := GetRelationsByUserID(userID)
 	c.Assert(err, IsNil)
-
-	relations, err := GetRelationsByUserID(userID1)
-	c.Assert(len(relations), Equals, 1)
-	c.Assert(relations[0].State, Equals, "liked")
-	c.Assert(relations[0].WipeUserID, Equals, userID2)
-
-	err = CreateUserRelation(userID2, userID1, "relation", "liked")
-	c.Assert(err, IsNil)
-
-	relations, err = GetRelationsByUserID(userID2)
-	c.Assert(len(relations), Equals, 1)
-	c.Assert(relations[0].State, Equals, "matched")
-	c.Assert(relations[0].WipeUserID, Equals, userID1)
-
+	c.Assert(len(relations), Equals, 2)
 }
