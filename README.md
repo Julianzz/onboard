@@ -9,7 +9,7 @@ Adding users and swiping other people in order to find a match.
 * install brew on mac, please follow the link https://brew.sh/
 * brew upgrade && brew update && brew install golang 
 * brew install postgres
-* set GOPATH variable to go local path, export GOPATH=~/gopath
+* set GOPATH variable to go local path, liking export GOPATH=~/gopath
  
 
 ## Build & Run
@@ -17,6 +17,6 @@ Adding users and swiping other people in order to find a match.
 * copy the code into the path: $GOPATH/src/github.com/p1cn/onboard/liuzhenzhong
 * start postgres
 * change  postgres database config in conf/config.yml
-* init database go run cmd/database/initdb.go
-* start server go run cmd/server/onboard.go -port=":8090" 
+* init database: go run cmd/database/initdb.go
+* start server: go run cmd/server/onboard.go -port=":8090" 
 
