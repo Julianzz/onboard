@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 
 	"github.com/p1cn/onboard/liuzhenzhong/config"
@@ -13,7 +14,11 @@ func main() {
 		fmt.Printf("error in load config %v\n", err)
 		return
 	}
-	port := ":8080"
-	server.StartServer(port, config)
+
+	var port = flag.String("port", ":8080", "http listen port")
+	flag.Parse()
+
+	fmt.Printf("begin to start server on port:%v\n", *port)
+	server.StartServer(*port, config)
 	fmt.Println("hello world")
 }

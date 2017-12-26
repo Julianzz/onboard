@@ -27,7 +27,8 @@ func main() {
 			name varchar(128),
 			type varchar(16),
 			create_time timestamp default now(),  
-			update_time timestamp default now()
+			update_time timestamp default now(),
+			PRIMARY KEY (user_id)
 		) `,
 		`CREATE TABLE IF NOT EXISTS relations(
 			user_id varchar(64), 
@@ -35,7 +36,8 @@ func main() {
 			type varchar(16), 
 			state varchar(16), 
 			create_time timestamp default now(), 
-			update_time timestamp default now()
+			update_time timestamp default now(),
+			PRIMARY KEY (user_id,wipe_user_id)
 			)`,
 	}
 
