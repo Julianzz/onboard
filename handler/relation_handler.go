@@ -3,7 +3,7 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"log"
 	"net/http"
 	"strings"
@@ -58,7 +58,7 @@ type RelationResult struct {
 }
 
 // Get relation get handler
-func (handler *RelationsHandler) Get(w http.ResponseWriter, r *http.Request, params map[string]string) {
+func (handler *RelationsHandler) Get(w http.ResponseWriter, r *http.Request, params map[string]string) (interface{}, error) {
 
 	// be cautious
 	userID := string(params["user_id"])
@@ -77,40 +77,35 @@ func (handler *RelationsHandler) Get(w http.ResponseWriter, r *http.Request, par
 		results = append(results, result)
 	}
 
-	values, _ := json.Marshal(results)
-	w.Write(values)
+	return results, nil
 }
 
 // Put relation put handler
-func (handler *RelationsHandler) Put(w http.ResponseWriter, r *http.Request, params map[string]string, body []byte) {
+func (handler *RelationsHandler) Put(w http.ResponseWriter, r *http.Request, params map[string]string, body []byte) (interface{}, error) {
 
 	if err := relationSchema.Validate(bytes.NewReader(body)); err != nil {
-		v := fmt.Sprintf("error %v", err)
-		w.Write([]byte(v))
-		return
+		return nil, NewRestfulError(err, http.StatusBadRequest, "wrong in request params")
 	}
 	var relation RelationResult
 	if err := json.Unmarshal(body, &relation); err != nil {
-		v := fmt.Sprintf("error in parse body: %v", err)
-		w.Write([]byte(v))
-		return
+		return nil, NewRestfulError(err, http.StatusBadRequest, "error in parsing body")
 	}
 
 	userID := string(params["user_id"])
 	wipeUserID := string(params["wipe_user_id"])
 	if userID == wipeUserID {
-		return
+		return nil, NewRestfulError(errors.New("same user id can not be matched"), http.StatusBadRequest, "wrong in inputing user_id")
 	}
 
 	user, _ := model.GetUserByID(userID)
 	wipeUser, _ := model.GetUserByID(wipeUserID)
 	if user == nil || wipeUser == nil {
-		w.Write([]byte("user not exists"))
-		return
+		return nil, NewRestfulError(errors.New("can not find user"), http.StatusNotFound, "can not for user to update")
 	}
 
 	err := model.CreateUserRelation(userID, wipeUserID, "relationship", relation.State)
 	if err != nil {
+		return nil, NewRestfulError(err, http.StatusInternalServerError, "error in creating relation")
 	}
 
 	rel, err := model.GetRelationsByUserIDs(userID, wipeUserID)
@@ -120,6 +115,5 @@ func (handler *RelationsHandler) Put(w http.ResponseWriter, r *http.Request, par
 		Type:   rel.Type,
 	}
 
-	values, _ := json.Marshal(relation)
-	w.Write(values)
+	return relation, nil
 }

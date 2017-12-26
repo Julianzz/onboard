@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -10,10 +12,10 @@ import (
 
 // RestHandlerInterface restful hander interface
 type RestHandlerInterface interface {
-	Get(w http.ResponseWriter, req *http.Request, params map[string]string)
-	Put(res http.ResponseWriter, req *http.Request, params map[string]string, body []byte)
-	Post(res http.ResponseWriter, req *http.Request, params map[string]string, body []byte)
-	Error(res http.ResponseWriter, req *http.Request, params map[string]string)
+	Get(w http.ResponseWriter, req *http.Request, params map[string]string) (interface{}, error)
+	Put(res http.ResponseWriter, req *http.Request, params map[string]string, body []byte) (interface{}, error)
+	Post(res http.ResponseWriter, req *http.Request, params map[string]string, body []byte) (interface{}, error)
+	Error(res http.ResponseWriter, req *http.Request, params map[string]string) (interface{}, error)
 }
 
 // RestfulError struct for restful error, including http code and info for return
@@ -37,34 +39,51 @@ func (cerr *RestfulError) Error() string {
 	return errorinfo
 }
 
+func (cerr *RestfulError) String() string {
+	errorinfo := fmt.Sprintf("error:%v info:%v", cerr.err, cerr.info)
+	return errorinfo
+}
+
 // RestfulHandler base restfule handler, will delegate method to other interface
 type RestfulHandler struct {
 	H RestHandlerInterface
 }
 
-func (handler *RestfulHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (handler *RestfulHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
+
+	var result interface{}
+	var err error
 
 	switch req.Method {
 	case "GET":
-		handler.H.Get(res, req, vars)
+		result, err = handler.H.Get(w, req, vars)
 	case "POST":
 		body, err := ioutil.ReadAll(req.Body)
 		// TODO, how to deal with read body error
 		if err != nil {
 			fmt.Printf("error in read body %v\n", err)
 		}
-		handler.H.Post(res, req, vars, body)
+		result, err = handler.H.Post(w, req, vars, body)
 	case "PUT":
 		body, err := ioutil.ReadAll(req.Body)
 
-		// TODO, how to deal with read body error
+		// TODO, how to deal with read body error, to ignore?
 		if err != nil {
 			fmt.Printf("error in read body %v\n", err)
 		}
-		handler.H.Put(res, req, vars, body)
+		result, err = handler.H.Put(w, req, vars, body)
 	default:
-		handler.H.Error(res, req, vars)
+		result, err = handler.H.Error(w, req, vars)
+	}
+
+	if err != nil {
+		e := err.(*RestfulError)
+		w.WriteHeader(e.code)
+		w.Write([]byte(e.String()))
+	} else {
+		values, _ := json.Marshal(result)
+		w.Write(values)
 	}
 }
 
@@ -73,21 +92,21 @@ type DefaultRestHandler struct {
 }
 
 // Get handle get request
-func (h *DefaultRestHandler) Get(w http.ResponseWriter, req *http.Request, params map[string]string) {
-	w.WriteHeader(http.StatusBadRequest)
+func (h *DefaultRestHandler) Get(w http.ResponseWriter, req *http.Request, params map[string]string) (interface{}, error) {
+	return nil, NewRestfulError(errors.New("not implement this method"), http.StatusBadRequest, "")
 }
 
 // Put handle put request
-func (h *DefaultRestHandler) Put(w http.ResponseWriter, req *http.Request, params map[string]string, body []byte) {
-	w.WriteHeader(http.StatusBadRequest)
+func (h *DefaultRestHandler) Put(w http.ResponseWriter, req *http.Request, params map[string]string, body []byte) (interface{}, error) {
+	return nil, NewRestfulError(errors.New("not implement this method"), http.StatusBadRequest, "")
 }
 
 // Post handler post request
-func (h *DefaultRestHandler) Post(w http.ResponseWriter, req *http.Request, params map[string]string, body []byte) {
-	w.WriteHeader(http.StatusBadRequest)
+func (h *DefaultRestHandler) Post(w http.ResponseWriter, req *http.Request, params map[string]string, body []byte) (interface{}, error) {
+	return nil, NewRestfulError(errors.New("not implement this method"), http.StatusBadRequest, "")
 }
 
 // handler error
-func (h *DefaultRestHandler) Error(w http.ResponseWriter, req *http.Request, params map[string]string) {
-	w.WriteHeader(http.StatusBadRequest)
+func (h *DefaultRestHandler) Error(w http.ResponseWriter, req *http.Request, params map[string]string) (interface{}, error) {
+	return nil, NewRestfulError(errors.New("not implement this method"), http.StatusBadRequest, "")
 }

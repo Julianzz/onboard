@@ -3,7 +3,6 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -13,41 +12,6 @@ import (
 
 	"github.com/p1cn/onboard/liuzhenzhong/model"
 )
-
-// UsersHandler handler user request
-type UsersHandler struct {
-	DefaultRestHandler
-}
-
-// UserResult user information return
-type UserResult struct {
-	UserID string `json:"id"`
-	Name   string `json:"name"`
-	Type   string `json:"type"`
-}
-
-// Get handle user list api
-func (handler *UsersHandler) Get(w http.ResponseWriter, r *http.Request, params map[string]string) {
-
-	users, err := model.GetUsers(-1)
-	if err != nil {
-		v := fmt.Sprintf("error %v", err)
-		w.Write([]byte(v))
-		return
-	}
-
-	results := make([]*UserResult, 0)
-	for _, user := range users {
-		result := &UserResult{
-			UserID: user.UserID,
-			Name:   user.Name,
-			Type:   user.Type,
-		}
-		results = append(results, result)
-	}
-	values, _ := json.Marshal(results)
-	w.Write(values)
-}
 
 const userInputSchemaJSON = `
 {
@@ -83,42 +47,67 @@ func init() {
 	}
 }
 
+// UsersHandler handler user request
+type UsersHandler struct {
+	DefaultRestHandler
+}
+
+// UserResult user information return
+type UserResult struct {
+	UserID string `json:"id"`
+	Name   string `json:"name"`
+	Type   string `json:"type"`
+}
+
+// Get handle user list api
+func (handler *UsersHandler) Get(w http.ResponseWriter, r *http.Request, params map[string]string) (interface{}, error) {
+
+	users, err := model.GetUsers(-1)
+	if err != nil {
+		return nil, NewRestfulError(err, http.StatusBadRequest, "error in fetch users lists")
+	}
+
+	// gen users result list
+	results := make([]*UserResult, 0)
+	for _, user := range users {
+		result := &UserResult{
+			UserID: user.UserID,
+			Name:   user.Name,
+			Type:   user.Type,
+		}
+		results = append(results, result)
+	}
+	return results, nil
+}
+
 // Post handler user like , unlike update
-func (handler *UsersHandler) Post(w http.ResponseWriter, r *http.Request, params map[string]string, body []byte) {
+func (handler *UsersHandler) Post(w http.ResponseWriter, r *http.Request, params map[string]string, body []byte) (interface{}, error) {
 	if err := inputSchema.Validate(bytes.NewReader(body)); err != nil {
-		v := fmt.Sprintf("error %v", err)
-		w.Write([]byte(v))
-		return
+		return nil, NewRestfulError(err, http.StatusBadRequest, "error in checking int")
 	}
 	var user UserResult
 	if err := json.Unmarshal(body, &user); err != nil {
-		v := fmt.Sprintf("error in parse body: %v", err)
-		w.Write([]byte(v))
-		return
+		return nil, NewRestfulError(err, http.StatusBadRequest, "error in parsing body")
 	}
 
+	// gen userid and save it
 	userUUID, _ := uuid.NewRandom()
 	userID := userUUID.Format(uuid.StyleWithoutDash)
 	t := "user"
 	err := model.CreateNewUser(userID, user.Name, t)
 	if err != nil {
-		v := fmt.Sprintf("error %v", err)
-		w.Write([]byte(v))
-		return
+		return nil, NewRestfulError(err, http.StatusBadRequest, "error in creating new user")
 	}
 
+	// fetch user information to return
 	u, err := model.GetUserByID(userID)
 	if err != nil {
-		v := fmt.Sprintf("error %v", err)
-		w.Write([]byte(v))
-		return
+		return nil, NewRestfulError(err, http.StatusBadRequest, "error in find user")
 	}
 	result := &UserResult{
 		UserID: u.UserID,
 		Name:   u.Name,
 		Type:   u.Type,
 	}
-
-	values, _ := json.Marshal(result)
-	w.Write(values)
+	return result, nil
 }
