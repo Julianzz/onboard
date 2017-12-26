@@ -85,6 +85,7 @@ func (handler *UsersHandler) Post(w http.ResponseWriter, r *http.Request, params
 	if err := inputSchema.Validate(bytes.NewReader(body)); err != nil {
 		return nil, NewRestfulError(err, http.StatusBadRequest, "error in checking int")
 	}
+
 	var user UserResult
 	if err := json.Unmarshal(body, &user); err != nil {
 		return nil, NewRestfulError(err, http.StatusBadRequest, "error in parsing body")

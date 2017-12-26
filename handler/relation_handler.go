@@ -62,9 +62,16 @@ func (handler *RelationsHandler) Get(w http.ResponseWriter, r *http.Request, par
 
 	// be cautious
 	userID := string(params["user_id"])
+
+	// check user
+	user, _ := model.GetUserByID(userID)
+	if user == nil {
+		return nil, NewRestfulError(errors.New("can not find user"), http.StatusNotFound, "can not find user")
+	}
+
 	relations, err := model.GetRelationsByUserID(userID)
 	if err != nil {
-		// process
+		return nil, NewRestfulError(err, http.StatusInternalServerError, "find relation wrong")
 	}
 
 	results := make([]*RelationResult, 0)

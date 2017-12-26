@@ -17,7 +17,6 @@ type DBSetting struct {
 
 // Config  server configuration
 type Config struct {
-
 	// DBSetting database settings
 	DBSetting DBSetting `yaml:"db_settings"`
 }

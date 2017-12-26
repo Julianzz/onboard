@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/p1cn/onboard/liuzhenzhong/tests"
+
 	"github.com/p1cn/onboard/liuzhenzhong/context"
 
 	"github.com/go-pg/pg"
@@ -21,9 +23,14 @@ type HandlerTest struct {
 	db     *pg.DB
 	server *http.Server
 	port   string
+
+	baseTest *tests.BaseTest
 }
 
 func (t *HandlerTest) SetUpTest(c *C) {
+	t.baseTest = &tests.BaseTest{}
+
+	t.baseTest.SetUpTest(c)
 
 	conf := &config.Config{
 		DBSetting: config.DBSetting{
@@ -54,6 +61,7 @@ func (t *HandlerTest) SetUpTest(c *C) {
 }
 
 func (t *HandlerTest) TearDownTest(c *C) {
+	t.baseTest.TearDownTest(c)
 	if t.server != nil {
 		t.server.Close()
 	}

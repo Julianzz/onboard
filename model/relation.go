@@ -53,6 +53,7 @@ func CreateUserRelation(userid1, userid2 string, t string, state string) error {
 		return err
 	}
 
+	// dislike will not go into math logic
 	if state != LikedState {
 		return nil
 	}

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -59,14 +60,16 @@ func (handler *RestfulHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 	case "GET":
 		result, err = handler.H.Get(w, req, vars)
 	case "POST":
-		body, err := ioutil.ReadAll(req.Body)
+		var body []byte
+		body, err = ioutil.ReadAll(req.Body)
 		// TODO, how to deal with read body error
 		if err != nil {
-			fmt.Printf("error in read body %v\n", err)
+			log.Printf("error in read body %v\n", err)
 		}
 		result, err = handler.H.Post(w, req, vars, body)
 	case "PUT":
-		body, err := ioutil.ReadAll(req.Body)
+		var body []byte
+		body, err = ioutil.ReadAll(req.Body)
 
 		// TODO, how to deal with read body error, to ignore?
 		if err != nil {
