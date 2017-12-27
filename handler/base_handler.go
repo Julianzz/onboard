@@ -96,20 +96,20 @@ type DefaultRestHandler struct {
 
 // Get handle get request
 func (h *DefaultRestHandler) Get(w http.ResponseWriter, req *http.Request, params map[string]string) (interface{}, error) {
-	return nil, NewRestfulError(errors.New("not implement this method"), http.StatusBadRequest, "")
+	return nil, NewRestfulError(errors.New("not implement this method"), http.StatusMethodNotAllowed, "")
 }
 
 // Put handle put request
 func (h *DefaultRestHandler) Put(w http.ResponseWriter, req *http.Request, params map[string]string, body []byte) (interface{}, error) {
-	return nil, NewRestfulError(errors.New("not implement this method"), http.StatusBadRequest, "")
+	return nil, NewRestfulError(errors.New("not implement this method"), http.StatusMethodNotAllowed, "")
 }
 
 // Post handler post request
 func (h *DefaultRestHandler) Post(w http.ResponseWriter, req *http.Request, params map[string]string, body []byte) (interface{}, error) {
-	return nil, NewRestfulError(errors.New("not implement this method"), http.StatusBadRequest, "")
+	return nil, NewRestfulError(errors.New("not implement this method"), http.StatusMethodNotAllowed, "")
 }
 
 // handler error
 func (h *DefaultRestHandler) Error(w http.ResponseWriter, req *http.Request, params map[string]string) (interface{}, error) {
-	return nil, NewRestfulError(errors.New("not implement this method"), http.StatusBadRequest, "")
+	return nil, NewRestfulError(errors.New("not implement this method"), http.StatusMethodNotAllowed, "")
 }
