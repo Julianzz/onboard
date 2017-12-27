@@ -57,6 +57,7 @@ type RelationResult struct {
 	Type   string `json:"type"`
 }
 
+// build the result return
 func (handler *RelationsHandler) buildRelation(rel *model.Relation) *RelationResult {
 	state := rel.State
 	if rel.MatchState == model.MatchedState {
