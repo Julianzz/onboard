@@ -113,8 +113,11 @@ func queryRelation(tx *pg.Tx, userID1, userID2 string) (*Relation, error) {
 }
 
 func updateMatch(tx *pg.Tx, userID1, userID2 string) error {
-	_, err := tx.Exec(`UPDATE relations SET match_state = 'matched' where user_id=? and wipe_user_id = ? and state='liked'`,
-		userID1, userID2)
+	_, err := tx.Exec(`UPDATE relations SET 
+		match_state = 'matched',
+		update_time = ?
+		where user_id=? and wipe_user_id = ? and state='liked'`,
+		time.Now(), userID1, userID2)
 	if err != nil {
 		log.Panicf("wrong in update relations user_id:%v wipe_user_id:%v err:%v", userID1, userID2, err)
 		return err
