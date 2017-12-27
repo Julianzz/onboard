@@ -49,6 +49,11 @@ Adding users and swiping other people in order to find a match.
 
 * start server:
 
-        go run cmd/server/onboard.go -port=":8090" 
+        go run cmd/server/onboard.go -port=":8080" 
 
 
+* test visit:
+
+        pip install requests
+        cd $ONBOARD_PATH/liuzhenzhong/scripts
+        python test.py
