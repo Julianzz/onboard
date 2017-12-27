@@ -57,6 +57,19 @@ type RelationResult struct {
 	Type   string `json:"type"`
 }
 
+func (handler *RelationsHandler) buildRelation(rel *model.Relation) *RelationResult {
+	state := rel.State
+	if rel.MatchState == model.MatchedState {
+		state = model.MatchedState
+	}
+	result := &RelationResult{
+		UserID: rel.WipeUserID,
+		State:  state,
+		Type:   rel.Type,
+	}
+	return result
+}
+
 // Get relation get handler
 func (handler *RelationsHandler) Get(w http.ResponseWriter, r *http.Request, params map[string]string) (interface{}, error) {
 
@@ -76,11 +89,7 @@ func (handler *RelationsHandler) Get(w http.ResponseWriter, r *http.Request, par
 
 	results := make([]*RelationResult, 0)
 	for _, rel := range relations {
-		result := &RelationResult{
-			UserID: rel.WipeUserID,
-			State:  rel.State,
-			Type:   rel.Type,
-		}
+		result := handler.buildRelation(&rel)
 		results = append(results, result)
 	}
 
@@ -93,7 +102,7 @@ func (handler *RelationsHandler) Put(w http.ResponseWriter, r *http.Request, par
 	if err := relationSchema.Validate(bytes.NewReader(body)); err != nil {
 		return nil, NewRestfulError(err, http.StatusBadRequest, "wrong in request params")
 	}
-	var relation RelationResult
+	relation := &RelationResult{}
 	if err := json.Unmarshal(body, &relation); err != nil {
 		return nil, NewRestfulError(err, http.StatusBadRequest, "error in parsing body")
 	}
@@ -116,11 +125,7 @@ func (handler *RelationsHandler) Put(w http.ResponseWriter, r *http.Request, par
 	}
 
 	rel, err := model.GetRelationsByUserIDs(userID, wipeUserID)
-	relation = RelationResult{
-		UserID: rel.WipeUserID,
-		State:  rel.State,
-		Type:   rel.Type,
-	}
+	relation = handler.buildRelation(rel)
 
 	return relation, nil
 }

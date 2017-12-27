@@ -30,6 +30,7 @@ func (t *BaseTest) SetUpTest(c *C) {
 			wipe_user_id varchar(64), 
 			type varchar(16), 
 			state varchar(16), 
+			match_state varchar(16),
 			create_time timestamp default now(), 
 			update_time timestamp default now(),
 			PRIMARY KEY (user_id,wipe_user_id)

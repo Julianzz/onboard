@@ -47,20 +47,22 @@ func (t *DBTest) TestUpdateBatchRelation(c *C) {
 		err = CreateUserRelation(userID2, userID1, "relation", state2)
 		c.Assert(err, IsNil)
 
+		matchedState := UnMatchedState
 		if state1 == state2 && state1 == "liked" {
-			state1 = "matched"
-			state2 = "matched"
+			matchedState = MatchedState
 		}
 		rel, err = GetRelationsByUserIDs(userID2, userID1)
 		c.Assert(rel, NotNil)
 		c.Assert(err, IsNil)
 		c.Assert(rel.State, Equals, state2)
+		c.Assert(rel.MatchState, Equals, matchedState)
 		c.Assert(rel.WipeUserID, Equals, userID1)
 
 		rel, err = GetRelationsByUserIDs(userID1, userID2)
 		c.Assert(rel, NotNil)
 		c.Assert(err, IsNil)
 		c.Assert(rel.State, Equals, state1)
+		c.Assert(rel.MatchState, Equals, matchedState)
 		c.Assert(rel.WipeUserID, Equals, userID2)
 		fmt.Println("inside test update relation")
 	}

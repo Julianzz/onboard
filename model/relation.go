@@ -16,6 +16,8 @@ const (
 	DisLikeState = "disliked"
 	// MatchedState match each other
 	MatchedState = "matched"
+	// not match
+	UnMatchedState = "unmatched"
 )
 
 //Relation struture info
@@ -27,6 +29,7 @@ type Relation struct {
 	WipeUserID string `sql:"wipe_user_id"`
 	Type       string `sql:"type"`
 	State      string `sql:"state"`
+	MatchState string `sql:"match_state"`
 
 	// match time
 	CreateTime time.Time `sql:"create_time,default:now()"`
@@ -44,6 +47,7 @@ func CreateUserRelation(userid1, userid2 string, t string, state string) error {
 		WipeUserID: userid2,
 		Type:       t,
 		State:      state,
+		MatchState: UnMatchedState,
 		CreateTime: time.Now(),
 		UpdateTime: time.Now(),
 	}
@@ -109,7 +113,7 @@ func queryRelation(tx *pg.Tx, userID1, userID2 string) (*Relation, error) {
 }
 
 func updateMatch(tx *pg.Tx, userID1, userID2 string) error {
-	_, err := tx.Exec(`UPDATE relations SET state = 'matched' where user_id=? and wipe_user_id = ? and state='liked'`,
+	_, err := tx.Exec(`UPDATE relations SET match_state = 'matched' where user_id=? and wipe_user_id = ? and state='liked'`,
 		userID1, userID2)
 	if err != nil {
 		log.Panicf("wrong in update relations user_id:%v wipe_user_id:%v err:%v", userID1, userID2, err)
@@ -128,11 +132,11 @@ func UpdateUserMatch(userID1, userID2 string) error {
 
 	err := DB.RunInTransaction(func(tx *pg.Tx) error {
 
+		//TODO merge into one sql
 		relation1, err := queryRelation(tx, userID1, userID2)
 		if err != nil {
 			return err
 		}
-
 		relation2, err := queryRelation(tx, userID2, userID1)
 		if err != nil {
 			return err
