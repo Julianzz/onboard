@@ -12,6 +12,7 @@ import (
 type User struct {
 	tableName struct{} `sql:"users"`
 
+	ID     int    `sql:"id"`
 	UserID string `sql:"user_id"`
 	Name   string `sql:"name"`
 	Type   string `sql:"type"`

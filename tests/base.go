@@ -18,22 +18,23 @@ func (t *BaseTest) SetUpTest(c *C) {
 		`DROP TABLE IF EXISTS relations`,
 		`DROP TABLE IF EXISTS users`,
 		`CREATE TABLE IF NOT EXISTS users(
-			user_id varchar(64),
-			name varchar(128),
-			type varchar(16),
+			id serial primary key ,
+			user_id varchar(64) not null unique,
+			name varchar(128) not null,
+			type varchar(16) not null,
 			create_time timestamp default now(),  
-			update_time timestamp default now(),
-			PRIMARY KEY (user_id)
+			update_time timestamp default now()
 		) `,
 		`CREATE TABLE IF NOT EXISTS relations(
-			user_id varchar(64), 
-			wipe_user_id varchar(64), 
-			type varchar(16), 
-			state varchar(16), 
-			match_state varchar(16),
+			id serial primary key,
+			user_id varchar(64) not null , 
+			wipe_user_id varchar(64) not null, 
+			type varchar(16) not null, 
+			state varchar(16) not null, 
+			match_state varchar(16) not null,
 			create_time timestamp default now(), 
 			update_time timestamp default now(),
-			PRIMARY KEY (user_id,wipe_user_id)
+			constraint user_wipe_user_uniq unique(user_id,wipe_user_id)
 		)`,
 	}
 

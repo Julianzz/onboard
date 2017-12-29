@@ -24,6 +24,7 @@ type Relation struct {
 	//add
 	tableName struct{} `sql:"relations"`
 
+	ID         int    `sql:"id"`
 	UserID     string `sql:"user_id"`
 	WipeUserID string `sql:"wipe_user_id"`
 	Type       string `sql:"type"`
